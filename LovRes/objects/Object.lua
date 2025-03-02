@@ -76,9 +76,13 @@ function Object:update(dt)
     self.transform:setTransform(self.position, self.rotation, self.scale)
 end
 
-function Object:draw(renderer)
+function Object:setMaterial(material)
+    self.material = material
+end
+
+function Object:draw(renderer, preparedLights)
     if self.visible then
-        -- load the shader and store it
+        -- load the shader and store it if it doesnt already exist
         if not renderer.shaders[self.material.id] then
             renderer:loadShader(self.material)
         end
@@ -90,8 +94,15 @@ function Object:draw(renderer)
         shader:send("projectionMatrix", renderer.camera.projectionMatrix)
         shader:send("viewMatrix", renderer.camera.viewMatrix)
 
-        -- send the material shader
+        -- send the material shader (checks if it needs lighting or not)
         self.material:send(shader)
+
+        -- send all lights
+        if preparedLights then
+            for i, lightArray in ipairs(preparedLights) do
+                shader:send("lights["..i.."]", lightArray)
+            end
+        end
 
         -- if there are instances render them, otherwise just draw the mesh
         if self.instancemesh then

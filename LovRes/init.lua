@@ -23,6 +23,7 @@ SOFTWARE.
 ]]--
 local cam = require "LovRes.objects.Camera"
 local object = require "LovRes.objects.Object"
+local scene = require "LovRes.objects.Scene"
 
 local LovRes = {}
 LovRes.__index = LovRes
@@ -102,6 +103,28 @@ end
 -- create new object
 function LovRes:newObject(path, position, rotation, scale) 
     return object.new(path, position, rotation, scale)
+end
+
+-- create new scene
+function LovRes:newScene()
+    return scene.new()
+end
+
+-- keeps track of all materials and their corresponding file path (might refactor later if it grows)
+local Materials = {
+    unlit = "LovRes.objects.materials.UnlitMaterial",
+    lit = "LovRes.objects.materials.LitMaterial"
+}
+
+-- create new material
+function LovRes:newMaterial(key, ...)
+    local materialPath = Materials[key]
+    if materialPath then
+        local materialClass = require(materialPath)
+        return materialClass.new(...)
+    else
+        error("Material with key '" .. key .. "' not found.")
+    end
 end
 
 return LovRes

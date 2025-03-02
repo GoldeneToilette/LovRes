@@ -2,12 +2,11 @@ local Material = require "LovRes/objects/Material"
 
 local UnlitMaterial = {}
 UnlitMaterial.__index = UnlitMaterial
-setmetatable(UnlitMaterial, Material)
+setmetatable(UnlitMaterial, { __index = Material })
 
 -- constructor
 function UnlitMaterial.new(texture)
-    local self = Material.new()
-    setmetatable(self, UnlitMaterial)
+    local self = setmetatable(Material.new(), UnlitMaterial)
     self.texture = texture or nil
     self.shader = "LovRes/shaders/Unlit.glsl"
     self.id = "Unlit"
@@ -17,14 +16,9 @@ end
 
 -- send the material properties to the given shader
 function UnlitMaterial:send(shader)
-    if self.texture then
-        shader:send("u_texture", self.texture)
-        shader:send("u_useTexture", true)
-    else
-        shader:send("u_texture", self.missingTexture)
-        shader:send("u_useTexture", false)
-    end
-
+    if not shader then return end -- prevents crash if no shader exists
+    shader:send("u_texture", self.texture or self.missingTexture)
+    shader:send("u_useTexture", self.useTexture)
     shader:send("u_color", self.color)
 end
 

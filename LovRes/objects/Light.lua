@@ -2,6 +2,7 @@
 local DirectionalLight = {}
 DirectionalLight.__index = DirectionalLight
 
+-- Creates a Directional light. This light is "global" and has no position. 
 function DirectionalLight.new(direction, color, intensity)
     local self = setmetatable({}, DirectionalLight)
     self.direction = direction or {0, -1, 0}
@@ -12,6 +13,7 @@ function DirectionalLight.new(direction, color, intensity)
     return self
 end
 
+-- Turns the directional light into a shader-readable format
 function DirectionalLight:toArray()
     return {
         self.type,
@@ -25,10 +27,11 @@ function DirectionalLight:toArray()
     }
 end
 
--- Point light
+
 local PointLight = {}
 PointLight.__index = PointLight
 
+-- Creates a Point light. Your typical light. It has a position, color, intensity and attenuation. Attenuation defines how far the light goes.
 function PointLight.new(position, color, intensity, attenuation)
     local self = setmetatable({}, PointLight)
     self.position = position or {0, 0, 0}
@@ -40,6 +43,7 @@ function PointLight.new(position, color, intensity, attenuation)
     return self
 end
 
+-- Turns the point light into a shader-readable format
 function PointLight:toArray()
     return {
         self.type,
@@ -57,10 +61,10 @@ function PointLight:toArray()
 end
 
 
--- Spotlight
 local SpotLight = {}
 SpotLight.__index = SpotLight
 
+-- Creates a spotlight. It does spotlight things. 
 function SpotLight.new(position, direction, angle, color, intensity, attenuation)
     local self = setmetatable({}, SpotLight)
     self.position = position or {0, 0, 0}
@@ -74,6 +78,7 @@ function SpotLight.new(position, direction, angle, color, intensity, attenuation
     return self
 end
 
+-- Turns the spotlight into a shader-readable format
 function SpotLight:toArray()
     return {
         self.type,

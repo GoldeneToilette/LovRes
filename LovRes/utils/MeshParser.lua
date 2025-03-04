@@ -13,7 +13,7 @@ local function fileExists(path)
     return info and info.type == "file"
 end
 
--- parse a file
+-- Picks the correct parsing function from the lookup table (only .obj rn)
 function MeshParser.parse(path)
     if not fileExists(path) then return nil, "File does not exist!" end
 
@@ -27,7 +27,7 @@ function MeshParser.parse(path)
     end
 end
 
--- parse .obj file
+-- Parser for .obj files
 function MeshParser.obj(path)
     local positions = {}
     local normals = {}

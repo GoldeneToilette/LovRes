@@ -5,6 +5,7 @@ function vector.new(x, y, z)
     return {x or 0, y or 0, z or 0}
 end
 
+-- Negates a vector
 function vector.negate(v)
     return { -v[1], -v[2], -v[3] }
 end

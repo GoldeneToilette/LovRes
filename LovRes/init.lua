@@ -24,11 +24,12 @@ SOFTWARE.
 local cam = require "LovRes.objects.Camera"
 local object = require "LovRes.objects.Object"
 local scene = require "LovRes.objects.Scene"
+local light = require "LovRes.objects.Light"
 
 local LovRes = {}
 LovRes.__index = LovRes
 
--- constructor
+-- Creates an instance of the renderer. This is where everything happens basically.
 function LovRes.new(pixelSize, width, height)
     local self = setmetatable({}, LovRes)
     self.vertexPath = love.filesystem.read("LovRes/shaders/LovRes.vert")
@@ -57,7 +58,8 @@ function LovRes.new(pixelSize, width, height)
     return self
 end
 
--- load a shader and cache it
+-- Loads a shader into the shader table. These shaders will be used across multiple objects.
+-- Accepts either a string path or a material object as parameter
 function LovRes:loadShader(shaderPath)
     -- path
     if type(shaderPath) == "string" then
@@ -73,7 +75,7 @@ function LovRes:loadShader(shaderPath)
     end
 end
 
--- start of rendering
+-- Start of rendering. This function prepares the canvas.
 function LovRes:start()
     if not self.drawing then
         self.drawing = true
@@ -85,12 +87,12 @@ function LovRes:start()
     end
 end
 
--- draw something
+-- Function for drawing objects and scenes to the canvas. This has to be between start() and stop()
 function LovRes:draw(object)
     object:draw(self)
 end
 
--- end of rendering
+-- End of rendering. This is where the canvas is drawn to the screen.
 function LovRes:stop()
     if self.drawing then
         love.graphics.setCanvas()
@@ -100,23 +102,39 @@ function LovRes:stop()
     end
 end
 
--- create new object
+-- Creates a new object. Valid file types: ".obj"
 function LovRes:newObject(path, position, rotation, scale) 
     return object.new(path, position, rotation, scale)
 end
 
--- create new scene
+-- Creates a new scene. Scenes allow you to make more complex stuff like lighting and shadows. 
 function LovRes:newScene()
     return scene.new()
 end
 
--- keeps track of all materials and their corresponding file path (might refactor later if it grows)
+-- Creates a new light ("point", "directional", "spot")
+function LovRes:newLight(type, ...)
+    if type == "point" then
+        return light.PointLight.new(...)
+    elseif type == "directional" then
+        return light.DirectionalLight.new(...)
+    elseif type == "spot" then
+        return light.SpotLight.new(...)
+    else
+        error("Unknown light type: " .. type)
+    end
+end
+
+-- keeps track of all materials and their corresponding file path (might refactor later)
 local Materials = {
     unlit = "LovRes.objects.materials.UnlitMaterial",
     lit = "LovRes.objects.materials.LitMaterial"
 }
 
--- create new material
+
+-- Creates a new material. Materials define how the objects look like.
+-- They hold data like textures, maps and references to shaders.
+-- The actual shaders are loaded into a seperate table so they can be reused across objects.
 function LovRes:newMaterial(key, ...)
     local materialPath = Materials[key]
     if materialPath then

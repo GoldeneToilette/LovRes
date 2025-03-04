@@ -4,7 +4,7 @@ local vector = require "LovRes.utils.Vector3D"
 local Camera = {}
 Camera.__index = Camera
 
--- constructor
+-- Creates a new camera. 
 function Camera.new()
     local self = setmetatable({}, Camera)    
     self.position = {-7, 0, 0}
@@ -28,15 +28,13 @@ function Camera.new()
     return self
 end
 
--- update function
+-- This update function updates the cameras matrices
 function Camera:update(dt)
-    self:firstPersonKeyboard(dt, 10)
-
     self.viewMatrix:viewMatrix(self.position, self.lookAt, self.up)
     self.projectionMatrix:perspectiveMatrix(self.fov, self.aspect, self.near, self.far)
 end
 
--- first person camera movement
+-- Implements first person keyboard movement (put it in love.update(dt))
 function Camera:firstPersonKeyboard(dt, speed)
     local forward = {math.cos(self.yaw), 0, math.sin(self.yaw)}
     local right = {math.sin(self.yaw), 0, -math.cos(self.yaw)}
@@ -69,7 +67,7 @@ function Camera:firstPersonKeyboard(dt, speed)
     self.lookAt[3] = self.position[3] + math.sin(self.yaw) * math.cos(self.pitch)
 end
 
--- first person camera rotation
+-- Implements first person mouse movement (put it in love.mousemoved())
 function Camera:firstPersonMouse(dx, dy, sensitivity)
     if self.mouseLocked then
         love.mouse.setRelativeMode(true)
@@ -91,7 +89,7 @@ function Camera:firstPersonMouse(dx, dy, sensitivity)
     self.lookAt[3] = self.position[3] + math.sin(self.yaw) * cosPitch 
 end
 
--- returns the normalized frustum planes
+-- Returns the normalized frustum planes of the camera
 function Camera:getFrustum()
     local m = self.projectionMatrix:multiplyMatrix(self.viewMatrix)
     local planes = {

@@ -4,7 +4,7 @@ local UnlitMaterial = {}
 UnlitMaterial.__index = UnlitMaterial
 setmetatable(UnlitMaterial, { __index = Material })
 
--- constructor
+-- Unlit material. Only supports a texture and color
 function UnlitMaterial.new(texture)
     local self = setmetatable(Material.new(), UnlitMaterial)
     self.texture = texture or nil

@@ -1,3 +1,5 @@
+-- Small library for adding camera effects (WIP)
+
 local Milkshake = {}
 Milkshake.__index = Milkshake
 

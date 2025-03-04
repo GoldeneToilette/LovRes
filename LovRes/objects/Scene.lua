@@ -1,7 +1,7 @@
 local Scene = {}
 Scene.__index = Scene
 
--- constructor
+-- Creates a new scene. Scenes hold objects, lights and the skybox. 
 function Scene.new()
     local self = setmetatable({}, Scene)
     self.objects = {}
@@ -10,15 +10,17 @@ function Scene.new()
     return self
 end
 
+-- Adds an object to the scene
 function Scene:addObject(object)
     table.insert(self.objects, object)
 end
 
+-- Adds a light to the scene
 function Scene:addLight(light)
    table.insert(self.lights, light) 
 end
 
--- Prepares the lights for being sent to the shader
+-- Turns the light data into arrays so it can be sent to the shaders
 function Scene:prepareLights()
     local newTable = {}
     for _, light in ipairs(self.lights) do
@@ -28,6 +30,7 @@ function Scene:prepareLights()
     return newTable
 end
 
+-- draws the entire scene
 function Scene:draw(renderer)
     for i, obj in ipairs(self.objects) do
         obj.draw(renderer)

@@ -4,7 +4,7 @@ local LitMaterial = {}
 LitMaterial.__index = LitMaterial
 setmetatable(LitMaterial, { __index = Material })
 
--- constructor
+-- Very simple material that supports lights
 function LitMaterial.new(texture, normal)
     local self = setmetatable(Material.new(), LitMaterial)
     self.texture = texture

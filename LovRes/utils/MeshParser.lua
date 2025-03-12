@@ -15,7 +15,7 @@ end
 
 -- Picks the correct parsing function from the lookup table (only .obj rn)
 function MeshParser.parse(path)
-    if not fileExists(path) then return nil, "File does not exist!" end
+    if not fileExists(path) then return error("File does not exist!") end
 
     local ext = path:match("^.+(%.[^%.]+)$")
     local parser = MeshParser.parsers[ext]

@@ -27,67 +27,103 @@ function MeshParser.parse(path)
     end
 end
 
+-- compare vertices
+local function compareVertices(v1, v2)
+    return v1[1][1] == v2[1][1] and v1[1][2] == v2[1][2] and v1[1][3] == v2[1][3] and
+           v1[2][1] == v2[2][1] and v1[2][2] == v2[2][2] and
+           v1[3][1] == v2[3][1] and v1[3][2] == v2[3][2] and v1[3][3] == v2[3][3]
+end
+
 -- Parser for .obj files
 function MeshParser.obj(path)
     local positions = {}
     local normals = {}
     local uvs = {}
 
-    local sortedVertices = {}
+    local uniqueVertices = {}
+    local vertexMap = {}
 
     for line in love.filesystem.lines(path) do
-            -- split the lines into parts
-            local parts = {}
-            for part in line:gmatch("%S+") do
-                table.insert(parts, part)
-            end
+        -- Split the line into parts
+        local parts = {}
+        for part in line:gmatch("%S+") do
+            table.insert(parts, part)
+        end
 
-            -- determines type and puts it in the tables accordingly
-            if parts[1] == "v" then
-                table.insert(positions, {tonumber(parts[2]), tonumber(parts[3]), tonumber(parts[4])})
-            elseif parts[1] == "vt" then
-                table.insert(uvs, {tonumber(parts[2]), tonumber(parts[3])})
-            elseif parts[1] == "vn" then
-                table.insert(normals, {tonumber(parts[2]), tonumber(parts[3]), tonumber(parts[4])})
-            -- f: v/vt/vn
-            elseif parts[1] == "f" then
-                local vertices = {}
-                for i = 2, #parts do
-                    local v, vt, vn = parts[i]:match("(%d*)/(%d*)/(%d*)")
-                    v, vt, vn = tonumber(v), tonumber(vt), tonumber(vn)
-                    table.insert(vertices, {
-                        v and positions[v][1] or 0,
-                        v and positions[v][2] or 0,
-                        v and positions[v][3] or 0,
-                        vt and uvs[vt][1] or 0,
-                        vt and uvs[vt][2] or 0,
-                        vn and normals[vn][1] or 0,
-                        vn and normals[vn][2] or 0,
-                        vn and normals[vn][3] or 0,
-                    })
-                end
+        -- parse vertex data
+        if parts[1] == "v" then
+            table.insert(positions, {tonumber(parts[2]), tonumber(parts[3]), tonumber(parts[4])})
+        elseif parts[1] == "vt" then
+            table.insert(uvs, {tonumber(parts[2]), tonumber(parts[3])})
+        elseif parts[1] == "vn" then
+            table.insert(normals, {tonumber(parts[2]), tonumber(parts[3]), tonumber(parts[4])})
+        -- parse faces
+        elseif parts[1] == "f" then
+            local faceVertices = {}
+            
+            -- parse each vertex in the face
+            for i = 2, #parts do
+                local v, vt, vn = parts[i]:match("(%d*)/(%d*)/(%d*)")
+                v, vt, vn = tonumber(v), tonumber(vt), tonumber(vn)
 
-                -- it triangulates the faces
-                if #vertices > 3 then
-                    -- choose a central vertex
-                    local centralVertex = vertices[1]
-    
-                    -- connect the central vertex to each of the other vertices to create triangles
-                    for i = 2, #vertices - 1 do
-                        table.insert(sortedVertices, centralVertex)
-                        table.insert(sortedVertices, vertices[i])
-                        table.insert(sortedVertices, vertices[i + 1])
-                    end
-                else
-                    for i = 1, #vertices do
-                        table.insert(sortedVertices, vertices[i])
+                -- default values for missing UVs or normals
+                local uv = vt and uvs[vt] or {0, 0}
+                local normal = vn and normals[vn] or {0, 0, 1}
+
+                -- create unique key for vertex
+                local vertexKey = {positions[v], uv, normal}
+
+                -- check if vertex already exists
+                local vertexIndex = nil
+                for idx, existingVertex in ipairs(uniqueVertices) do
+                    if compareVertices(existingVertex, vertexKey) then
+                        vertexIndex = idx
+                        break
                     end
                 end
-                
+
+                -- if its not in there, add it
+                if not vertexIndex then
+                    vertexIndex = #uniqueVertices + 1
+                    table.insert(uniqueVertices, vertexKey)
+                end
+
+                -- add index to the map
+                table.insert(faceVertices, vertexIndex)
             end
+
+            -- triangulate quads
+            if #faceVertices == 4 then
+                table.insert(vertexMap, faceVertices[1])
+                table.insert(vertexMap, faceVertices[2])
+                table.insert(vertexMap, faceVertices[3])
+            
+                table.insert(vertexMap, faceVertices[1])
+                table.insert(vertexMap, faceVertices[3])
+                table.insert(vertexMap, faceVertices[4])
+            elseif #faceVertices == 3 then
+                -- already a triangle
+                table.insert(vertexMap, faceVertices[1])
+                table.insert(vertexMap, faceVertices[2])
+                table.insert(vertexMap, faceVertices[3])
+            elseif #faceVertices > 4 then
+                error("Unsupported n-gon face detected with " .. #faceVertices .. " vertices! As of right now only triangles and quads are supported")
+            end
+        end
     end
 
-    return sortedVertices
+    -- prepare the vertices
+    local finalVertices = {}
+    for _, vertex in ipairs(uniqueVertices) do
+        local position = vertex[1]
+        local uv = vertex[2]
+        local normal = vertex[3]
+
+        -- create a table according to the vertex format
+        table.insert(finalVertices, {position[1], position[2], position[3], uv[1], uv[2], normal[1], normal[2], normal[3]})
+    end
+
+    return finalVertices, vertexMap
 end
 
 return MeshParser

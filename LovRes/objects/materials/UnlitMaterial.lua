@@ -1,4 +1,4 @@
-local Material = require "LovRes/objects/Material"
+local Material = require "LovRes.objects.Material"
 
 local UnlitMaterial = {}
 UnlitMaterial.__index = UnlitMaterial

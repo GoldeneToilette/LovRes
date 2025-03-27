@@ -1,10 +1,11 @@
 function love.load()
     love.window.setMode(0, 0, {fullscreen = true})
-    lovres = require("LovRes").new()
+    lovres = require("LovRes").new(4)
 
-    monkey = lovres:newObject("monkey.obj", {0,0,0}, {0,0,0}, {1,1,1})
-
-    monkey2 = lovres:newObject("monkey.obj", {5,0,5}, {0,180,90}, {1,1,1})
+    cube = lovres:newObject("cube.obj", {5, 0, 5}, {0, 0, 0}, {0.5, 0.5, 0.5})
+    cube.material:setUseTexture(false)
+    cube.material.color = {1.0, 1.0, 1.0, 1.0}
+    cube:setInstances({{1,0,1}, {2,0,2}})
 end
 
 function love.update(dt)
@@ -15,8 +16,7 @@ end
 function love.draw()
     lovres:start()
 
-    lovres:draw(monkey)
-    lovres:draw(monkey2)
+    lovres:draw(cube)
 
     lovres:stop()
 end
@@ -27,10 +27,7 @@ end
 
 function love.keypressed(key, scancode, isrepeat)
     if key == "escape" then
-       love.event.quit()
+        love.event.quit()
     end
+end
 
-    if key == "z" then
-        monkey2.material:setUseTexture(not monkey2.material.useTexture)
-    end
- end

@@ -8,8 +8,7 @@ Object.__index = Object
 local vertexFormat = {
     {"VertexPosition", "float", 3},
     {"VertexUV", "float", 2},
-    {"VertexNormal", "float", 3},
-    {"VertexColor", "float", 4}
+    {"VertexNormal", "float", 3}
 }
 
 local instanceFormat = {
@@ -37,8 +36,9 @@ end
 -- Internal function for parsing the mesh data and creating the mesh.
 function Object:setupMesh(mesh)
     if type(mesh) == "string" then
-        self.vertices = parser.parse(mesh)
+        self.vertices, self.vertexMap = parser.parse(mesh)
         self.mesh = love.graphics.newMesh(vertexFormat, self.vertices, "triangles")
+        self.mesh:setVertexMap(self.vertexMap)
     else
         self.mesh = mesh
     end
@@ -49,7 +49,7 @@ end
 -- Creates instances for the mesh. Format: {"InstancePosition", "float", 3}
 function Object:setInstances(vertices)
     self.instancemesh = love.graphics.newMesh(instanceFormat, vertices, nil, "static")
-    self.mesh:attachAttribute("InstancePosition", self.instancemesh, "perinstance")    
+    self.mesh:attachAttribute("InstancePosition", self.instancemesh, "perinstance")
 end
 
 -- Set the visibility of the object. If visible is set to false, it will be skipped during rendering.

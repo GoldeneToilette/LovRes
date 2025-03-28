@@ -41,7 +41,6 @@ function LovRes.new(pixelSize, width, height)
 
     self.canvasWidth = math.floor(self.width / self.pixelSize) 
     self.canvasHeight = math.floor(self.height / self.pixelSize)
-
     self.mainCanvas = love.graphics.newCanvas(self.canvasWidth, self.canvasHeight, { format = "normal" })
     self.mainCanvas:setFilter("nearest", "nearest")
 

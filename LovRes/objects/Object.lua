@@ -5,13 +5,13 @@ local unlitMaterial = require "LovRes.objects.materials.UnlitMaterial"
 local Object = {}
 Object.__index = Object
 
-local vertexFormat = {
+Object.vertexFormat = {
     {"VertexPosition", "float", 3},
     {"VertexUV", "float", 2},
     {"VertexNormal", "float", 3}
 }
 
-local instanceFormat = {
+Object.instanceFormat = {
     {"InstancePosition", "float", 3}
 }
 
@@ -37,18 +37,18 @@ end
 function Object:setupMesh(mesh)
     if type(mesh) == "string" then
         self.vertices, self.vertexMap = parser.parse(mesh)
-        self.mesh = love.graphics.newMesh(vertexFormat, self.vertices, "triangles")
+        self.mesh = love.graphics.newMesh(self.vertexFormat, self.vertices, "triangles")
         self.mesh:setVertexMap(self.vertexMap)
     else
         self.mesh = mesh
     end
-    self.instancemesh = love.graphics.newMesh(instanceFormat, {{nil, nil, nil}}, nil, "static")
+    self.instancemesh = love.graphics.newMesh(self.instanceFormat, {{nil, nil, nil}}, nil, "static")
     self.mesh:attachAttribute("InstancePosition", self.instancemesh, "perinstance")
 end
 
 -- Creates instances for the mesh. Format: {"InstancePosition", "float", 3}
 function Object:setInstances(vertices)
-    self.instancemesh = love.graphics.newMesh(instanceFormat, vertices, nil, "static")
+    self.instancemesh = love.graphics.newMesh(self.instanceFormat, vertices, nil, "static")
     self.mesh:attachAttribute("InstancePosition", self.instancemesh, "perinstance")
 end
 

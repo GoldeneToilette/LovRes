@@ -142,7 +142,6 @@ function matrix:setTransform(translation, rotation, scale)
     
     -- Quaternion components
     -- Function takes euler angles as input and transforms it to quaternions internally
-    -- this way the user doesnt have to deal with quaternion bs while avoiding gimbal lock
     local w, x, y, z = matrix.eulerToQuaternion(math.rad(rotation[1]), math.rad(rotation[2]), math.rad(rotation[3]))
 
     -- if no rotation is provided it skips the calculations

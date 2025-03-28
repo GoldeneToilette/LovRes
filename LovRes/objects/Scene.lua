@@ -1,3 +1,5 @@
+local skybox = require "LovRes.objects.Skybox"
+
 local Scene = {}
 Scene.__index = Scene
 
@@ -6,7 +8,7 @@ function Scene.new()
     local self = setmetatable({}, Scene)
     self.objects = {}
     self.lights = {}
-    self.skybox = {}
+    self.skybox = skybox.new()
     return self
 end
 
@@ -32,8 +34,12 @@ end
 
 -- draws the entire scene
 function Scene:draw(renderer)
+    -- render skybox before everything else
+    self.skybox:draw(renderer)
+
+    -- render rest of the objects
     for i, obj in ipairs(self.objects) do
-        obj.draw(renderer)
+        obj:draw(renderer)
     end
 end
 

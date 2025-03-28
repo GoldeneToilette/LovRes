@@ -72,21 +72,27 @@ function Camera:firstPersonMouse(dx, dy, sensitivity)
     if self.mouseLocked then
         love.mouse.setRelativeMode(true)
     end
+    
+    -- update yaw and pitch
     self.yaw = self.yaw + dx * sensitivity / 200
     self.pitch = self.pitch - dy * sensitivity / 200
 
-    -- clamp the pitch so you dont break your neck
-    self.pitch = math.max(math.min(self.pitch, math.rad(90)), math.rad(-90))
+    -- clamp the pitch to avoid 90° angles
+    self.pitch = math.max(math.min(self.pitch, math.rad(89.9)), math.rad(-89.9))
 
-    local sign = math.cos(self.pitch)
-    sign = (sign > 0 and 1) or (sign < 0 and -1) or 0
+    -- calculate cosPitch
+    local cosPitch = math.cos(self.pitch)
 
-    -- idk what that does but if i dont include it everything breaks
-    local cosPitch = sign * math.max(math.abs(math.cos(self.pitch)), 0.00001)
-
-    self.lookAt[1] = self.position[1] + math.cos(self.yaw) * cosPitch
-    self.lookAt[2] = self.position[2] + math.sin(self.pitch)
-    self.lookAt[3] = self.position[3] + math.sin(self.yaw) * cosPitch 
+    -- Prevents issues when pitch has extreme values
+    if math.abs(self.pitch) < math.rad(89) then
+        self.lookAt[1] = self.position[1] + math.cos(self.yaw) * cosPitch
+        self.lookAt[2] = self.position[2] + math.sin(self.pitch)
+        self.lookAt[3] = self.position[3] + math.sin(self.yaw) * cosPitch
+    else
+        self.lookAt[1] = self.position[1] + math.cos(self.yaw) * 0.0001
+        self.lookAt[2] = self.position[2] + math.sin(self.pitch) * 0.0001
+        self.lookAt[3] = self.position[3] + math.sin(self.yaw) * 0.0001
+    end
 end
 
 -- Returns the normalized frustum planes of the camera

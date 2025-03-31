@@ -1,6 +1,6 @@
 # LovRes
 
-LovRes is a small project that makes 3D in Löve2D easier.
+LovRes is a small 3d library for löve2d.
 
 ## License
 

@@ -9,7 +9,7 @@ function love.load()
     cube.material.texture:setFilter("nearest", "nearest")
 
     -- generates a simple plane
-    local gridSize = 100
+    local gridSize = 1000
     local instancePositions = {}
     for x = 0, gridSize - 1 do
         for z = 0, gridSize - 1 do

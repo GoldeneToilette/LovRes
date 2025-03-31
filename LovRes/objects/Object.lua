@@ -62,21 +62,29 @@ function Object:setTransform(position, rotation, scale)
     self.position = position 
     self.rotation = rotation
     self.scale = scale
+
+    self.transform:setTransform(self.position, self.rotation, self.scale)
 end
 
 -- Set the position of the object.
 function Object:setPosition(x, y, z)
     self.position = {x, y, z}
+
+    self.transform:setTransform(self.position, self.rotation, self.scale)
 end
 
 -- Set the rotation of the object in euler angles.
 function Object:setRotation(x, y, z)
     self.rotation = {x, y, z}
+
+    self.transform:setTransform(self.position, self.rotation, self.scale)
 end
 
 -- Set the scale of the object.
 function Object:setScale(x, y, z)
     self.scale = {x, y, z}
+
+    self.transform:setTransform(self.position, self.rotation, self.scale)
 end
 
 -- Update function. As of right now, it only updates the transform of the object.

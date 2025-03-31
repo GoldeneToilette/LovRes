@@ -27,6 +27,7 @@ end
 function love.update(dt)
     lovres.camera:firstPersonKeyboard(dt, 10)
     lovres.camera:update(dt)
+
 end
 
 function love.draw()
